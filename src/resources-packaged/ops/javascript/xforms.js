@@ -5138,6 +5138,7 @@ ORBEON.xforms.Init = {
     _tree: function(treeDiv) {
         var controlId = treeDiv.id;
         var allowMultipleSelection = ORBEON.util.Dom.hasClass(treeDiv, "xforms-select");
+		var showToolTip = ORBEON.util.Dom.hasClass(treeDiv, "xforms-show-tooltip");//SAN: Usability improvement for tree
         if (ORBEON.util.Utils.isNewXHTMLLayout())
             treeDiv = treeDiv.getElementsByTagName("div")[0];
         // Save in the control if it allows multiple selection
@@ -5164,8 +5165,35 @@ ORBEON.xforms.Init = {
             // or collapse if expanded
             if (object.node.expanded) return false;
         });
+		//SAN: Usability improvement for tree				
+		if(showToolTip) {
+			yuiTree.subscribe("expandComplete", function(node) {ORBEON.xforms.Init._addToolTip(node.tree);}); 
+			yuiTree.subscribe("collapseComplete", function(node) {ORBEON.xforms.Init._addToolTip(node.tree);}); 
+			ORBEON.xforms.Init._addToolTip(yuiTree);
+		}
         ORBEON.util.Dom.removeClass(ORBEON.util.Utils.isNewXHTMLLayout() ? treeDiv.parentNode : treeDiv, "xforms-initially-hidden");
     },
+	/**
+	*SAN: Usability improvement for tree
+	**/
+	_addToolTip: function(yuiTree) {
+		var nodes = yuiTree.getNodesByProperty();
+		// nodes can be null when the tree is empty
+        if (nodes != null) {
+			for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++) {
+                var node = nodes[nodeIndex];
+                if(!node.hasIcon) continue;
+				var contentEl = ORBEON.util.Dom.getElementById(node.contentElId);
+				if(contentEl == null) continue; //This node isn't visible on page yet
+				var iconEl = contentEl.previousSibling;
+				var orbeonToolTip = new YAHOO.widget.Tooltip("orbeonToolTip-"+contentEl.id, {
+					context: iconEl.id, 
+					text: (node.expanded? "Collapse " : "Expand ") + node.label,
+					showDelay: 100
+				});	
+             }
+        }
+	},	
 
     /**
      * Create a sub-menu attached to the given menu item. In the nameValueArray we

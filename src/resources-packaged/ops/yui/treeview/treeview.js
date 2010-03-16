@@ -2228,7 +2228,8 @@ YAHOO.widget.Node.prototype = {
             sb[sb.length] = '<td'; 
             sb[sb.length] = ' id="' + this.getToggleElId() + '"';
             sb[sb.length] = ' class="' + this.getStyle() + '"';
-            sb[sb.length] = '><a href="#" class="ygtvspacer">&nbsp;</a></td>';
+            //SAN: Usability improvement for tree
+            sb[sb.length] = '><a class="ygtvspacer">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></td>';
         }
 
         sb[sb.length] = '<td';
